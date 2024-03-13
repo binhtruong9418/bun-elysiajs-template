@@ -38,7 +38,7 @@ class UserService {
     newUser.password = hash;
     newUser.salt = salt;
     newUser.role = AppRole.USER;
-    const created = await this._userRepository.save(user);
+    const created = await this._userRepository.save(newUser);
     //remove password and salt
     delete created.password;
     delete created.salt;
