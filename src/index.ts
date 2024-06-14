@@ -1,16 +1,11 @@
 import {Elysia} from "elysia";
 import "reflect-metadata";
-import {AppDataSource} from "./data-source";
 import {cors} from "@elysiajs/cors";
 import jwt from "@elysiajs/jwt";
 import swagger from "@elysiajs/swagger";
-import {auth} from "./module";
 import errorMiddleware from "./middleware/errorMiddleware";
 import responseMiddleware from "./middleware/responseMiddleware";
-
-AppDataSource.initialize().then(() => {
-  console.log('Database connected');
-});
+import {binancePlugin} from "./module";
 
 const app = new Elysia();
 //open cors
@@ -23,19 +18,6 @@ app.use(swagger({
       title: 'ElysiaJS',
       description: 'ElysiaJS API Documentation',
       version: '1.0.0',
-    },
-    tags: [
-      {name: 'Auth', description: 'Authentication endpoints'},
-    ],
-    components: {
-      securitySchemes: {
-        JwtAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'Enter JWT Bearer token **_only_**'
-        }
-      }
     },
   },
 
@@ -53,18 +35,11 @@ app.get('/', () => {
 app
   .onAfterHandle(responseMiddleware)
   .onError(errorMiddleware)
-  .group('/api', (ctx: any) => {
-    ctx.use(jwt({
-      name: 'jwt',
-      // @ts-ignore
-      secret: Bun.env.JWT_SECRET,
-      exp: '1y'
-    }));
-    //add module
-    ctx.use(auth)
-
-    return ctx;
-  });
+  .group("/api", (group) =>
+        group
+            .use(binancePlugin)
+        //add more plugins here
+  )
 
 // @ts-ignore
 app.listen(Bun.env.PORT || 3000);

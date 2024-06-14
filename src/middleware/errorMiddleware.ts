@@ -1,4 +1,4 @@
-const errorMiddleware = ({code, error, set}) => {
+const errorMiddleware = ({code, error, set}: any) => {
   //https://elysiajs.com/patterns/error-handling.html
   console.log(error)
   if (code === "UNKNOWN") {
